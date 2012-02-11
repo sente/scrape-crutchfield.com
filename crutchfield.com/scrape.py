@@ -36,30 +36,38 @@ def crawl_category(root):
     for plink in root.xpath("//div/div[@id='productList-block-container']/div[@class='productList-block']/div[@class='productList-desc']/h3/a"):
         try:
             text = "%s\t%s\t%s" %(plink.sourceline, plink.attrib['href'], plink.text.strip())
-            print text.encode('utf-8')
             url = plink.attrib['href']
 
             download_item_page(url)
         except Exception, e:
-            print plink.sourceline
             logger.exception('wtf')
 
 
 def download_item_page(url):
 
-
+    content = requests.get(url).content
 
     destination = urlparse.urlsplit(url).path
     destination = "./content%s" % destination
     dest_dir = os.path.dirname(destination)
-    print dest_dir, destination
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
+
+
 
     #requests.get(url).content
     root = lxml.html.parse(url).getroot()
     with open(destination,'w') as ofile:
         ofile.write(lxml.html.tostring(root))
+
+    root.make_links_absolute()
+
+    with open(destination.replace('html','abs'),'w') as ofile:
+        ofile.write(lxml.html.tostring(root))
+
+    with open(destination.replace('html','orig'),'w') as ofile:
+        ofile.write(content)
+
 
     print "saved %s to %s" % (url, destination)
 
