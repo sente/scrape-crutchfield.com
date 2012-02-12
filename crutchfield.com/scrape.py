@@ -19,17 +19,6 @@ else:
     url = sys.argv[1]
 
 
-
-#for p in root.xpath("//div/div[@id='productList-block-container']"):
-#    print 'outer loop'
-#    for c in p.xpath('./div/div/a'):
-#        print '\tinner loop'
-#        print c.sourceline,c.tag,c.attrib.get('href','')
-#    for c in p.xpath('./div/div/a/child::text()'):
-#        print c
-
-
-
 def crawl_category(root):
 
 
@@ -82,18 +71,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-
-
-
-#
-#
-#
-#for alink in root.xpath("//div/div[@id='productList-block-container']/div[@class='productList-block']/div[@class='productList-desc']/a"):
-#    print alink
-#
-#
-#
-#
 
 
 # http://www.crutchfield.com/g_51000/Powered-Subwoofers.html?tp=114&showAll=Y
