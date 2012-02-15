@@ -11,6 +11,14 @@ import urlparse
 import random
 import glob
 
+
+# DELETE EMPTY LIST ELEMENTS
+
+for foo in tree.getiterator(tag='li'):
+    print foo.tag, foo.text, len(list(foo.iterchildren()))
+    if not foo.text or len(list(foo.iterchildren())):
+        print "should delete", foo.tag
+
 def get_breadcrumbs(root):
     ar = []
     for a in root.xpath("//div[@id='crumb-trail']/a"):

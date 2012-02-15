@@ -8,19 +8,29 @@ import logging
 import urllib
 import urlparse
 
-logger = logging.getLogger(__name__)
-logging.basicConfig(level=logging.INFO)
+#logger = logging.getLogger(__name__)
+#logging.basicConfig(level=logging.INFO)
+
+
+from scrapelogging import get_scrape_logger
+
+logger = get_scrape_logger('stu')
+
 #logger.setLevel(logging.DEBUG)
 
+sku = sys.argv[1]
+url = sys.argv[2]
 
-if len(sys.argv) < 2:
-    url = 'http://www.crutchfield.com/g_520/Component-Subwoofers.html?tp=111&showAll=Y'
-else:
-    url = sys.argv[1]
+logger = get_scrape_logger(sku)
+logger.info('STARTING: %s' % sku)
+
+#if len(sys.argv) < 2:
+#    url = 'http://www.crutchfield.com/g_520/Component-Subwoofers.html?tp=111&showAll=Y'
+#else:
+#    url = sys.argv[1]
 
 
 def crawl_category(root):
-
 
     for plink in root.xpath("//div/div[@id='productList-block-container']/div[@class='productList-block']/div[@class='productList-desc']/h3/a"):
         try:
@@ -42,8 +52,6 @@ def download_item_page(url):
     if not os.path.exists(dest_dir):
         os.makedirs(dest_dir)
 
-
-
     #requests.get(url).content
     root = lxml.html.parse(url).getroot()
     with open(destination,'w') as ofile:
@@ -57,8 +65,7 @@ def download_item_page(url):
     with open(destination.replace('html','orig'),'w') as ofile:
         ofile.write(content)
 
-
-    print "saved %s to %s" % (url, destination)
+    logger.info("SAVED:\t%s\t%s\t%s" % (sku, destination, url))
 
 
 def main():
