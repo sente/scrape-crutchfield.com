@@ -12,6 +12,10 @@ import random
 import glob
 
 
+import logging
+
+#mylogger = logging.GetLogger(__name__)
+
 # DELETE EMPTY LIST ELEMENTS
 
 
@@ -52,6 +56,7 @@ def get_overview_clean(root):
 
 
 def get_overview_cleanest(root):
+#    mylogger = logging.basicConfig(level=logging.DEBUG)
     overview = root.xpath("//div[@id='OverviewPane']")[0]
 
     r = lxml.html.fromstring(lxml.html.tostring(overview).strip())
@@ -62,14 +67,22 @@ def get_overview_cleanest(root):
     for bydiv in r.xpath("//div[@id='overviewByDiv']"):
         bydiv.drop_tree()
 
+    parents = []
     for a in r.xpath('//a'):
         try:
             if a.getparent() is not None and a.getparent().tag == 'li':
-                a.getparent().drop_tree()
+                parents.append(a.getparent())
+#                a.getparent().drop_tree()
             else:
                 a.drop_tree()
-        except:
-            sys.stderr.write("warning...\n")
+        except Exception, e:
+            sys.stderr.write(str(e))
+            sys.stderr.write("warning..." + str(e) + "\n")
+            logging.exception('error')
+
+    for p in set(parents):
+        p.drop_tree()
+
     for h3 in r.xpath('//h3'):
         if h3.text and h3.text.startswith("Our take on the"):
             h3.text = h3.text.replace("Our take on the ","")
@@ -80,9 +93,12 @@ def get_overview_cleanest(root):
 def get_shortdescription(root):
     try:
         desc = root.xpath("//span[@itemprop='description']")[0].text
+        if not desc:
+            desc = ''
         return desc.strip()
     except Exception, e:
-        sys.stderr.write(str(e))
+        logging.exception('error')
+        sys.stderr.write("warning..." + str(e)+"\n")
         return ""
 #        sys.stderr.write("warning...")
 

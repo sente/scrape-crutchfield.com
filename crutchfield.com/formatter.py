@@ -74,7 +74,8 @@ def load_from_file():
     for count,tup in enumerate(items):
 
         cats,file = tup
-        print count, cats,file
+        print count, cats, file
+
         res = get_fields.test(file)
         fields = {}
 
@@ -101,14 +102,15 @@ def load_from_file():
 
 
 
-def save_ds(ds)
+def save_ds(ds):
     open('ds.csv','w').write(ds.csv)
     open('ds.xls','w').write(ds.xls)
     open('ds.xlsx','w').write(ds.xlsx)
     open('ds.json','w').write(ds.json)
 
 
-
+if __name__ == '__main__':
+    ds = load_from_file()
 
 #open('ds.csv','w').write(ds.csv)
 #open('ds.xls','w').write(ds.xls)
