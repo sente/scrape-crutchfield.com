@@ -14,10 +14,16 @@ import glob
 
 # DELETE EMPTY LIST ELEMENTS
 
-for foo in tree.getiterator(tag='li'):
-    print foo.tag, foo.text, len(list(foo.iterchildren()))
-    if not foo.text or len(list(foo.iterchildren())):
-        print "should delete", foo.tag
+
+
+#def get_clean_overview(root):
+#
+#    for a in tree.xpath('//a'):
+#        a.getparent().remove(a)
+#    for foo in tree.getiterator(tag='li'):
+#        print foo.tag, foo.text, len(list(foo.iterchildren()))
+#        if not foo.text or len(list(foo.iterchildren())):
+#            print "should delete", foo.tag
 
 def get_breadcrumbs(root):
     ar = []
@@ -45,9 +51,40 @@ def get_overview_clean(root):
     return lxml.html.tostring(r)
 
 
+def get_overview_cleanest(root):
+    overview = root.xpath("//div[@id='OverviewPane']")[0]
+
+    r = lxml.html.fromstring(lxml.html.tostring(overview).strip())
+    for script in r.xpath('//script'):
+        script.drop_tree()
+    for img in r.xpath('//img'):
+        img.drop_tree()
+    for bydiv in r.xpath("//div[@id='overviewByDiv']"):
+        bydiv.drop_tree()
+
+    for a in r.xpath('//a'):
+        try:
+            if a.getparent() is not None and a.getparent().tag == 'li':
+                a.getparent().drop_tree()
+            else:
+                a.drop_tree()
+        except:
+            sys.stderr.write("warning...\n")
+    for h3 in r.xpath('//h3'):
+        if h3.text and h3.text.startswith("Our take on the"):
+            h3.text = h3.text.replace("Our take on the ","")
+
+    return lxml.html.tostring(r)
+
+
 def get_shortdescription(root):
-    desc = root.xpath("//span[@itemprop='description']")[0].text
-    return desc.strip()
+    try:
+        desc = root.xpath("//span[@itemprop='description']")[0].text
+        return desc.strip()
+    except Exception, e:
+        sys.stderr.write(str(e))
+        return ""
+#        sys.stderr.write("warning...")
 
 def get_productname(root):
     name = root.xpath("//span[@itemprop='name']")[0].text
@@ -109,6 +146,7 @@ def get_data(root):
     res['price'] = get_price(root)
     res['overview'] = get_overview(root)
     res['overview_clean'] = get_overview_clean(root)
+    res['overview_cleanest'] = get_overview_cleanest(root)
     res['shortdescription'] = get_shortdescription(root)
     res['productname'] = get_productname(root)
     res['canonical'] = get_canonical(root)
